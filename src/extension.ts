@@ -64,23 +64,100 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Flagle</title>
         <style>
+
+			body {
+				display: flex;
+				flex-direction: column;
+				justify-content: center;
+				align-items: center;
+			}
+
+			img {
+				padding-top: 20px;
+				object-fit: contain;
+			}
+
+			label {
+				text-align: center;
+				font-size: 12px;
+			}
+
+			input{
+				background-color: #353535;
+				color: #f3f3f3;
+				border: 1.5px solid #007acc;
+				border-radius: 3px;
+				padding: 6px 12px;
+				font-size: 14px;
+				line-height: 20px;
+				transition: background-color 0.2s ease-in-out;
+				margin-top: 10px;
+			}
+
+			input[type="text"]:focus {
+				background-color: #3c3c3c;
+				color: #f3f3f3;
+				outline: none;
+				border-color: #007acc;
+			}
+
+			#buttons {
+				flex-direction: row;
+			}
+
+			#checkButton, #nextButton {
+				margin-top: 20px;
+			}
+
+			#user-points {
+				margin-top: 20px;
+			}
+
             #countryName {
                 visibility: hidden;
             }
+
+			button {
+				background-color: #007acc;
+				color: white;
+				border: none;
+				border-radius: 4px;
+				font-size: 14px;
+				font-weight: 500;
+				padding: 6px 12px;
+				cursor: pointer;
+				transition: background-color 0.2s ease-in-out;
+				margin-left: 5px;
+				margin-right: 5px;
+			}
+
+			button:hover {
+				background-color: #106ebe;
+			}
+
+			button:active {
+				background-color: #005b9a;
+			}
+
+			button[disabled] {
+				background-color: #ccc;
+				color: #666;
+				cursor: default;
+			}
         </style>
     </head>
-    <body>
+    <body>	
+        <h1>Flagle</h1>
         <img src="${flagImageUrl}" height="120">
-        <h1 id="countryName">${randomCountryName}</h1>
+        <h2 id="countryName">${randomCountryName}</h2>
         <label for="answer">What country does this flag belong to?</label>
-        <br>
         <input type="text" id="answer">
-        <br>
-        <br>
-        <button id="checkButton" onclick="checkAnswer()">Check</button>
-        <button id="nextButton" onclick="refreshFlag()" disabled>Next</button>
+        <div id="buttons">
+			<button id="checkButton" onclick="checkAnswer()">Check</button>
+        	<button id="nextButton" onclick="refreshFlag()" disabled>Next</button>
+		</div>
 		<br>
-		<h1 id="user-points">Points: ${userPoints}</h1>
+		<h2 id="user-points">Points: ${userPoints}</h2>
         <script>
 			const vscode = acquireVsCodeApi();
             function checkAnswer() {
@@ -120,11 +197,3 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
     </body>
     </html>`;
 }
-
-
-
-// if (answer.toLowerCase() === "${randomCountryName.toLowerCase()}") {
-//     countryName.style.visibility = "visible";
-// } else {
-//     countryName.style.visibility = "hidden";
-// }
