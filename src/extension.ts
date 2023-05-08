@@ -94,7 +94,7 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
 				margin-top: 10px;
 			}
 
-			input[type="text"]:focus {
+			input:focus {
 				background-color: #3c3c3c;
 				color: #f3f3f3;
 				outline: none;
@@ -192,6 +192,23 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
 						points.textContent = "Points: "+message.text;
 						break;
             	}
+        	});
+
+			window.addEventListener('keydown', event => {
+				const checkButton = document.getElementById("checkButton");
+				const nextButton = document.getElementById("nextButton");
+				const answer = document.getElementById("answer");
+
+				if (answer.value == ""){
+					answer.focus();
+				}
+				else if (event.keyCode === 13) {
+					if (checkButton.disabled) {
+						refreshFlag();
+					} else {
+						checkAnswer();
+					}
+				}
         	});
         </script>
     </body>
