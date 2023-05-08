@@ -12,8 +12,10 @@ export function activate(context: vscode.ExtensionContext) {
 			const countries = JSON.parse(jsonString);
 			const countryCodes = Object.keys(countries);
 			const randomIndex = Math.floor(Math.random() * countryCodes.length);
-			const randomCountryCode = countryCodes[randomIndex];
-			const randomCountryName = countries[randomCountryCode];
+			let randomCountryCode = countryCodes[randomIndex];
+			let randomCountryName = countries[randomCountryCode];
+
+			let userPoints = 0;
 
 			let panel = vscode.window.createWebviewPanel(
 				'Flagle',
@@ -23,22 +25,23 @@ export function activate(context: vscode.ExtensionContext) {
 					enableScripts: true
 				}
 			);
-			panel.webview.html = getWebviewContent(randomCountryCode, randomCountryName);
+			panel.webview.html = getWebviewContent(randomCountryCode, randomCountryName, userPoints);
 
 			panel.webview.onDidReceiveMessage(
 				message => {
 					switch (message.command) {
 						case 'refresh':
-							console.log("Refreshing...");
 							const newRandomIndex = Math.floor(Math.random() * countryCodes.length);
-							const newRandomCountryCode = countryCodes[newRandomIndex];
-							const newRandomCountryName = countries[newRandomCountryCode];
-							const newFlagImageUrl = `https://flagcdn.com/w2560/${newRandomCountryCode.toLowerCase()}.png`;
-							console.log("After Refreshing...");
-							panel.webview.html = getWebviewContent(newRandomCountryCode, newRandomCountryName);
+							randomCountryCode = countryCodes[newRandomIndex];
+							randomCountryName = countries[randomCountryCode];
+							panel.webview.html = getWebviewContent(randomCountryCode, randomCountryName, userPoints);
+							console.log(randomCountryName);
+							return;
+						case 'incrementPoints':
+							userPoints++;
+							panel.webview.postMessage({ command: 'updatePoints', text: userPoints });
 							return;
 						case 'check':
-							console.log("Checking...");
 							return;
 					}
 				},
@@ -50,7 +53,7 @@ export function activate(context: vscode.ExtensionContext) {
 	);
 }
 
-function getWebviewContent(randomCountryCode: string, randomCountryName: string) {
+function getWebviewContent(randomCountryCode: string, randomCountryName: string, userPoints: number) {
 	const flagImageUrl = `https://flagcdn.com/h120/${randomCountryCode.toLowerCase()}.png`;
 	return `<!DOCTYPE html>
     <html lang="en">
@@ -74,6 +77,8 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string)
         <br>
         <button onclick="checkAnswer()">Check</button>
         <button id="nextButton" onclick="refreshFlag()" disabled>Next</button>
+		<br>
+		<h1 id="user-points">${userPoints}</h1>
         <script>
 			const vscode = acquireVsCodeApi();
             function checkAnswer() {
@@ -85,16 +90,29 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string)
 				countryName.style.visibility = "visible";
 
                 if (answer.toLowerCase() === "${randomCountryName.toLowerCase()}") {
-					vscode.postMessage({ command: 'check' });
+					vscode.postMessage({ command: 'incrementPoints' });
                 } else {
 					vscode.postMessage({ command: 'check' });
 
                 }
 				nextButton.disabled = false
             }
+
 			function refreshFlag() {
                 vscode.postMessage({ command: 'refresh' });
             }
+
+			window.addEventListener('message', event => {
+
+				const message = event.data;
+				const points = document.getElementById('user-points');
+
+				switch (message.command) {
+					case 'updatePoints':
+						points.textContent = message.text;
+						break;
+            	}
+        	});
         </script>
     </body>
     </html>`;
