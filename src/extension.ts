@@ -41,7 +41,9 @@ export function activate(context: vscode.ExtensionContext) {
 							userPoints++;
 							panel.webview.postMessage({ command: 'updatePoints', text: userPoints });
 							return;
-						case 'check':
+						case 'resetPoints':
+							userPoints = 0;
+							panel.webview.postMessage({ command: 'updatePoints', text: userPoints });
 							return;
 					}
 				},
@@ -78,7 +80,7 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
         <button onclick="checkAnswer()">Check</button>
         <button id="nextButton" onclick="refreshFlag()" disabled>Next</button>
 		<br>
-		<h1 id="user-points">${userPoints}</h1>
+		<h1 id="user-points">Points: ${userPoints}</h1>
         <script>
 			const vscode = acquireVsCodeApi();
             function checkAnswer() {
@@ -92,7 +94,7 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
                 if (answer.toLowerCase() === "${randomCountryName.toLowerCase()}") {
 					vscode.postMessage({ command: 'incrementPoints' });
                 } else {
-					vscode.postMessage({ command: 'check' });
+					vscode.postMessage({ command: 'resetPoints' });
 
                 }
 				nextButton.disabled = false
@@ -109,7 +111,7 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
 
 				switch (message.command) {
 					case 'updatePoints':
-						points.textContent = message.text;
+						points.textContent = "Points: "+message.text;
 						break;
             	}
         	});
