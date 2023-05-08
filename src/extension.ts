@@ -15,9 +15,6 @@ export function activate(context: vscode.ExtensionContext) {
 			const randomCountryCode = countryCodes[randomIndex];
 			const randomCountryName = countries[randomCountryCode];
 
-			console.log(randomCountryCode);
-			console.log(randomCountryName);
-
 			let panel = vscode.window.createWebviewPanel(
 				'Flagle',
 				'Flagle',
@@ -28,16 +25,26 @@ export function activate(context: vscode.ExtensionContext) {
 			);
 			panel.webview.html = getWebviewContent(randomCountryCode, randomCountryName);
 
-			panel.webview.onDidReceiveMessage(message => {
-				if (message.command === 'refresh') {
-					console.log("Siema");
-					const newRandomIndex = Math.floor(Math.random() * countryCodes.length);
-					const newRandomCountryCode = countryCodes[newRandomIndex];
-					const newRandomCountryName = countries[newRandomCountryCode];
-					const newFlagImageUrl = `https://flagcdn.com/w2560/${newRandomCountryCode.toLowerCase()}.png`;
-					panel!.webview.html = getWebviewContent(newRandomCountryCode, newRandomCountryName);
-				}
-			});
+			panel.webview.onDidReceiveMessage(
+				message => {
+					switch (message.command) {
+						case 'refresh':
+							console.log("Refreshing...");
+							const newRandomIndex = Math.floor(Math.random() * countryCodes.length);
+							const newRandomCountryCode = countryCodes[newRandomIndex];
+							const newRandomCountryName = countries[newRandomCountryCode];
+							const newFlagImageUrl = `https://flagcdn.com/w2560/${newRandomCountryCode.toLowerCase()}.png`;
+							console.log("After Refreshing...");
+							panel.webview.html = getWebviewContent(newRandomCountryCode, newRandomCountryName);
+							return;
+						case 'check':
+							console.log("Checking...");
+							return;
+					}
+				},
+				undefined,
+				context.subscriptions
+			);
 		}
 		)
 	);
@@ -51,17 +58,52 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string)
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Flagle</title>
+        <style>
+            #countryName {
+                visibility: hidden;
+            }
+        </style>
     </head>
     <body>
-        <h1>${randomCountryName}</h1>
         <img src="${flagImageUrl}" height="120">
-        <button onclick="refreshFlag()">Refresh</button>
+        <h1 id="countryName">${randomCountryName}</h1>
+        <label for="answer">What country does this flag belong to?</label>
+        <br>
+        <input type="text" id="answer">
+        <br>
+        <br>
+        <button onclick="checkAnswer()">Check</button>
+        <button id="nextButton" onclick="refreshFlag()" disabled>Next</button>
         <script>
-            function refreshFlag() {
-                const vscode = acquireVsCodeApi();
+			const vscode = acquireVsCodeApi();
+            function checkAnswer() {
+
+                const answer = document.getElementById("answer").value.trim().toLowerCase();
+                const countryName = document.getElementById("countryName");
+                const nextButton = document.getElementById("nextButton");
+
+				countryName.style.visibility = "visible";
+
+                if (answer.toLowerCase() === "${randomCountryName.toLowerCase()}") {
+					vscode.postMessage({ command: 'check' });
+                } else {
+					vscode.postMessage({ command: 'check' });
+
+                }
+				nextButton.disabled = false
+            }
+			function refreshFlag() {
                 vscode.postMessage({ command: 'refresh' });
             }
         </script>
     </body>
     </html>`;
 }
+
+
+
+// if (answer.toLowerCase() === "${randomCountryName.toLowerCase()}") {
+//     countryName.style.visibility = "visible";
+// } else {
+//     countryName.style.visibility = "hidden";
+// }
