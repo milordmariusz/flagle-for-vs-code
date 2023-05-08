@@ -85,7 +85,7 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
 			input{
 				background-color: #353535;
 				color: #f3f3f3;
-				border: 1.5px solid #007acc;
+				border: none;
 				border-radius: 3px;
 				padding: 6px 12px;
 				font-size: 14px;
