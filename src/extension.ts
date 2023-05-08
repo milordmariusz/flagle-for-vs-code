@@ -77,7 +77,7 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
         <input type="text" id="answer">
         <br>
         <br>
-        <button onclick="checkAnswer()">Check</button>
+        <button id="checkButton" onclick="checkAnswer()">Check</button>
         <button id="nextButton" onclick="refreshFlag()" disabled>Next</button>
 		<br>
 		<h1 id="user-points">Points: ${userPoints}</h1>
@@ -98,6 +98,7 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
 
                 }
 				nextButton.disabled = false
+				checkButton.disabled = true
             }
 
 			function refreshFlag() {
