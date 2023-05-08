@@ -114,6 +114,7 @@ function getWebviewContent(randomCountryCode: string, randomCountryName: string,
 			}
 
             #countryName {
+				text-align: center;
                 visibility: hidden;
             }
 
